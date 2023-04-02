@@ -57,9 +57,19 @@ access_template = [
     "spanning-tree portfast",
     "spanning-tree bpduguard enable",
 ]
-
 trunk_template = [
     "switchport trunk encapsulation dot1q",
     "switchport mode trunk",
     "switchport trunk allowed vlan {}",
 ]
+if_config=dict(access=access_template, trunk=trunk_template)
+mode=input('Введите режим работы интерфейса (access/trunk):')
+#mode='trunk'
+interface=input('Введите тип и номер интерфейса:')
+#interface='Fa0/1'
+vlan=input('Введите номер влан(ов):')
+#vlan='2,3'
+if_config_str='\n'.join(if_config[mode])
+print("interface {}".format(interface))
+print(if_config_str.format(vlan))
+#print(if_config[mode])

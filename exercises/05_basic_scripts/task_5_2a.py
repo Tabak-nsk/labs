@@ -47,5 +47,34 @@ bin_ip = "00001010000000010000000111000011"
 00001010000000010000000111000000
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
-
 """
+template_network = '''
+Network:
+{0:<9} {1:<9} {2:<9} {3:<9}
+{0:08b}  {1:08b}  {2:08b}  {3:08b}
+'''
+template_mask = '''
+Mask:
+/{4}
+{0:<9} {1:<9} {2:<9} {3:<9}
+{0:08b}  {1:08b}  {2:08b}  {3:08b}
+'''
+template_ip_bin='''{0:08b}{1:08b}{2:08b}{3:08b}'''
+prefix=input('Введите префикс в формате 10.1.1.0/24:')
+#prefix="10.1.1.4/24"
+prefix=prefix.split('/')
+
+mask=prefix[1]
+ip=prefix[0]
+#mask_oct=oct(mask)
+mask_bin="1" * int(mask) + "0" * (32-(int(mask)))
+#mask_ten=mask_bin[0:8]+'.'+mask_bin[8:16]+'.'+mask_bin[16:24]+'.'+mask_bin[-8:]
+mask_ten=[int(mask_bin[0:8],2),int(mask_bin[8:16],2),int(mask_bin[16:24],2),int(mask_bin[24:32],2)]
+ip=ip.split('.')
+#bin_ip=bin(int(network[0]))+bin(int(network[1]))+bin(int(network[2]))+format(int(network[3])), 'b')
+bin_ip=template_ip_bin.format(int(ip[0]),int(ip[1]),int(ip[2]),int(ip[3]))
+bin_network=bin_ip[0:int(mask)] + "0" * (32-(int(mask)))
+ten_network=[int(bin_network[0:8],2),int(bin_network[8:16],2),int(bin_network[16:24],2),int(bin_network[24:32],2)]
+#print('network=',network,' mask=',mask,' mask_bin=',mask_bin, ' mask_ten=',mask_ten, ' bin_ip=',bin_ip, ' bin_network=',bin_network, ' ten_network=',ten_network)
+print(template_network.format(int(ten_network[0]),int(ten_network[1]),int(ten_network[2]),int(ten_network[3])))
+print(template_mask.format(mask_ten[0],mask_ten[1],mask_ten[2],mask_ten[3],mask))
