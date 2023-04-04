@@ -17,6 +17,7 @@ Enter VLAN number: 10
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+#from pprint import pprint
 mac_input=input('Веедите мак:')
 with open('CAM_table.txt', 'r') as file_src:
     macs=list('')
@@ -32,4 +33,5 @@ with open('CAM_table.txt', 'r') as file_src:
     #macs=','.join(macs)
     for mac in macs:
         vlan,macc,port=mac
+#        pprint(locals())
         print("{:<9} {:<20} {:<6}".format(vlan,macc,port))
