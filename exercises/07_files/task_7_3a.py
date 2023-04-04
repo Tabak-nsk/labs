@@ -40,3 +40,16 @@
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+with open('CAM_table.txt', 'r') as file_src:
+    macs=list('')
+#    print(type(mac))
+    for line in file_src:
+        if 'DYNAMIC' in line:
+            mac=line.strip().replace('DYNAMIC','').split()
+            mac[0]=int(mac[0])
+            macs.append(mac)
+            macs.sort()
+#    print(macs)
+    #macs=','.join(macs)
+    for mac in macs:
+        print("{:<9} {:<20} {:<6}".format(*mac))

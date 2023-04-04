@@ -20,3 +20,18 @@
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+#from sys import argv
+
+#with open(argv[1], 'r') as file_src, open(argv[2], 'w') as file_dest:
+with open('CAM_table.txt', 'r') as file_src:
+    for line in file_src:
+        if 'DYNAMIC' in line:
+            print(line.strip().replace('DYNAMIC',''))
+#        if not line.startswith('!'):
+#            i=0
+#           for ignores in ignore:
+#                if ignores not in line:
+#                    i+=1
+#                   if i==3:
+#                        file_dest.write(line)
+#                        print(line.rstrip())

@@ -17,3 +17,19 @@ Enter VLAN number: 10
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+mac_input=input('Веедите мак:')
+with open('CAM_table.txt', 'r') as file_src:
+    macs=list('')
+#    print(type(mac))
+    for line in file_src:
+        if 'DYNAMIC' in line:
+            mac=line.strip().replace('DYNAMIC','').split()
+            if mac[0]==mac_input:
+                mac[0]=int(mac[0])
+                macs.append(mac)
+    macs.sort()
+#    print(macs)
+    #macs=','.join(macs)
+    for mac in macs:
+        vlan,macc,port=mac
+        print("{:<9} {:<20} {:<6}".format(vlan,macc,port))

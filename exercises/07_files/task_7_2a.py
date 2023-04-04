@@ -17,3 +17,15 @@
 """
 
 ignore = ["duplex", "alias", "configuration"]
+from sys import argv
+
+with open(argv[1], 'r') as f:
+#with open('config_sw1.txt', 'r') as f:
+    for line in f:
+        if not line.startswith('!'):
+            i=0
+            for ignores in ignore:
+                if ignores not in line:
+                    i+=1
+                    if i==3:
+                        print(line.rstrip())
