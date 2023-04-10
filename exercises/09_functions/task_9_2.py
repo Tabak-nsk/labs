@@ -60,3 +60,23 @@ trunk_config_2 = {
     "FastEthernet0/15": [111, 130],
     "FastEthernet0/14": [117],
 }
+
+
+#print(access_config)
+def generate_trunk_config(intf_vlan_mapping, trunk_template):
+    intf_cfg=[]
+    for intf,vlans in intf_vlan_mapping.items():
+        intf_cfg.append(f"interface {intf}")
+        #преобразуем список чисел в строку
+        vlan_str=''
+        if len(vlans)>1:
+            for vlan in vlans:
+                vlan_str=vlan_str+' '+str(vlan)
+        else: vlan_str=str(vlans[0])
+        vlan_str=vlan_str.strip().replace(' ',',')
+        for command in trunk_template:
+            if 'switchport trunk allowed vlan' in command:
+                intf_cfg.append(f"{command} {str(vlan_str)}")
+            else: intf_cfg.append(f"{command}")
+    return intf_cfg
+print(generate_trunk_config(trunk_config, trunk_mode_template))

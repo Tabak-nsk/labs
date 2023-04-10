@@ -23,3 +23,26 @@
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+def get_int_vlan_map(config_filename):
+    intf_acc_dict={}
+    intf_trunk_dict={}
+    with open(config_filename, 'r') as f:
+        for line in f:
+            if 'interface F' in line:
+                intf=line.strip().replace('interface ','')
+#                print(line)
+            if 'access vlan' in line:
+#                    print(line)
+                    vlans=line.strip().replace('switchport access vlan ','')
+                    intf_acc_dict[intf]=int(vlans)
+            if 'trunk allowed' in line:
+#                    print(line)
+                    vlans=line.strip().replace('switchport trunk allowed vlan ','').split(',')
+                    vlan_digit=[]
+                    for vlan in vlans:
+                        vlan_digit.append(int(vlan))
+                    intf_trunk_dict[intf]=vlan_digit
+    intf_tuple=(intf_acc_dict, intf_trunk_dict)
+    return intf_tuple
+#    print(intf_acc_dict, intf_trunk_dict)
+print(get_int_vlan_map('config_sw1.txt'))
