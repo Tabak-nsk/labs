@@ -36,6 +36,33 @@ R6           Fa 0/2          143           R S I           2811       Fa 0/0
 
 
 def parse_cdp_neighbors(command_output):
+    command_list=command_output.strip().split('\n')
+    local_list=[]
+    remote_list=[]
+    for command in command_list:
+        if 'show cdp neighbors' in command:
+            if '>' in command:
+                device_local=command.strip().split('>')[0]
+            elif '#' in command:
+                device_local=command.strip().split('#')[0]
+        elif '/' in command:
+            device_remote,int_name_local,int_num_local,*_=command.strip().split()
+            command_list=command.strip().split()
+            command_list.reverse()
+            int_name_remote=command_list[1]
+            int_num_remote=command_list[0]
+            int_local=int_name_local+int_num_local
+            int_remote=int_name_remote+int_num_remote
+        #print (device_local,int_local,device_remote,int_remote)
+            local=(device_local,int_local)
+            remote=(device_remote,int_remote)
+            local_list.append(local)
+            remote_list.append(remote)
+        #print (local_list,remote_list)
+    dict_output=dict(zip(local_list,remote_list))
+    #   command_list=command_output.strip().split('>')
+#    device_local=command_list[0]
+    return dict_output
     """
     Тут мы передаем вывод команды одной строкой потому что именно в таком виде будет
     получен вывод команды с оборудования. Принимая как аргумент вывод команды,
@@ -46,5 +73,5 @@ def parse_cdp_neighbors(command_output):
 
 
 if __name__ == "__main__":
-    with open("sh_cdp_n_sw1.txt") as f:
+    with open("sh_cdp_n_r3.txt") as f:
         print(parse_cdp_neighbors(f.read()))
