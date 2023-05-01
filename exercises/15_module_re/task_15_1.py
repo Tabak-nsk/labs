@@ -2,7 +2,7 @@
 """
 Задание 15.1
 
-Создать функцию get_ip_from_cfg, которая ожидает как аргумент имя файла,
+Создать функцию , которая ожидает как аргумент имя файла,
 в котором находится конфигурация устройства.
 
 Функция должна обрабатывать конфигурацию и возвращать IP-адреса и маски,
@@ -23,3 +23,18 @@
 а не ввод пользователя.
 
 """
+import re
+
+def get_ip_from_cfg(file):
+    with open(file, 'r') as f:
+        ip_mask=[]
+        for line in f:
+            line=re.search(r' ip address ((?:\d{1,3}\.){3}\d{1,3}) ((?:\d{1,3}\.){3}\d{1,3})',line)
+            if line:
+                ip_mask.append(line.group(1,2))
+                #print(line.group(1,2))
+        return ip_mask
+       
+    
+if __name__ == '__main__':
+    get_ip_from_cfg('config_r1.txt')

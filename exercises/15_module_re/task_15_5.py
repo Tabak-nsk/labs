@@ -26,3 +26,17 @@ description Connected to SW1 port Eth 0/1
 
 Проверить работу функции на файле sh_cdp_n_sw1.txt.
 """
+import re
+
+def generate_description_from_cdp(file_name):
+    regex=r'(?P<neighbor>\S+)\s+'r'(?P<local_intf>\w+ \S+)\s+\d+\s+\w \w \w\s+\S+\s+(?P<remote_intf>\w+ \S+)'
+    with open(file_name) as f:
+        #dict_descr_intf={m.group('local_intf')}
+        dict_descr_intf={}
+        for m in re.finditer(regex, f.read()):
+            #print(m.group('neighbor','local_intf','remote_intf'))         
+            dict_descr_intf.update({m.group('local_intf'):'description Connected to '+m.group('neighbor')+' port '+m.group('remote_intf')})
+    return dict_descr_intf
+
+if __name__ == '__main__':
+    print(generate_description_from_cdp('sh_cdp_n_sw1.txt'))
