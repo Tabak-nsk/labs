@@ -44,8 +44,37 @@
 """
 
 import glob
+import re
+import csv
 
-sh_version_files = glob.glob("sh_vers*")
-# print(sh_version_files)
-
-headers = ["hostname", "ios", "image", "uptime"]
+def parse_sh_version(output_sh_version):
+    #print (output_sh_version)
+    ios = re.search(r'(\d+\.\d+(?:\(\d+\))?\S+),',output_sh_version).group(1)
+    image = re.search(r'((?:flash|disk\d)\:\S+)"',output_sh_version).group(1)
+    uptime = re.search(r'(\d+ days, \d+ hours, \d+ minutes)',output_sh_version).group(1)
+    return (ios,image,uptime)
+    
+def write_inventory_to_csv(data_filenames,csv_filename):
+    headers = ["hostname", "ios", "image", "uptime"]
+    with open(csv_filename, 'w') as file_output:
+        writer = csv.writer(file_output)
+        writer.writerow(headers)
+        for data_filename in data_filenames:
+            hostname=re.search(r'sh_version_(\w+).txt',data_filename).group(1)
+            #print(data_filename)
+            #print(hostname)
+            f = open(data_filename,'r')
+            inventory = parse_sh_version(f.read())
+            data_to_write=[hostname]
+            for data in inventory:
+                data_to_write.append(data)
+            print(data_to_write)
+            writer.writerow(data_to_write)
+            f.close()
+            
+if __name__ == '__main__':
+    sh_version_files = glob.glob("sh_vers*")
+    write_inventory_to_csv(sh_version_files,'routers_inventory.csv')
+    #print(sh_version_files)
+    
+    

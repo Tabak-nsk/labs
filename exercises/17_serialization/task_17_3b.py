@@ -43,3 +43,48 @@
 > pip install graphviz
 
 """
+import yaml, draw_network_graph
+
+def unique_dict_keys_values(topology_dict):
+    '''
+    Функция которая на входе ожидает словарь и проверяет уникальность ключей и значений
+    На выходе возвращает словарь где ключи и значения уникальны
+    '''
+    topology_dict2 = topology_dict.copy()
+#    print(topology_dict)
+    for key in topology_dict2.keys():
+        topology_dict2 = topology_dict.copy()
+        for value in topology_dict2.values():
+#            print(position,key,value)
+            if key==value:
+                del topology_dict[key]
+#                print(topology_dict)
+    return topology_dict
+
+def transform_topology(topology_file_yaml):
+    '''
+    Функция на входе ожидает имя yaml файла
+    Cчитывает его и преобразует в словарь кортежей
+    '''
+    topology_dict_final={}
+    with open(topology_file_yaml) as f:
+        from_yaml = yaml.safe_load(f)
+    #print(from_yaml)
+    for host,neighbor_data in from_yaml.items():
+        #print(host,neighbor_data)
+        for host_intf,neighbor in neighbor_data.items():
+            #print(host_intf,neighbor)
+            for nbr_host,nbr_intf in neighbor.items():
+                topology_dict = {(host,host_intf):(nbr_host,nbr_intf)}
+            topology_dict_final.update(topology_dict)
+    #print (unique_network_map(topology_dict_final))
+    #print(topology_dict_final)
+    return unique_dict_keys_values(topology_dict_final)
+    
+if __name__ == '__main__':
+    #transform_topology('topology.yaml')
+    #print(unique_network_map(transform_topology('topology.yaml')))
+    draw_network_graph.draw_topology(transform_topology('topology.yaml'))
+    
+    
+    

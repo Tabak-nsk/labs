@@ -31,3 +31,37 @@ sw3,00:E9:22:11:A6:50,100.1.1.7,3,FastEthernet0/21
 sw2_dhcp_snooping.txt, sw3_dhcp_snooping.txt.
 
 """
+import csv
+import re
+
+def  write_dhcp_snooping_to_csv(filenames,output):
+    
+    headers=['switch','mac','ip','vlan','interface']
+    #открываем csv файл на запись
+    with open(output, 'w') as file_output:
+        writer = csv.writer(file_output)
+        #записываем заголовок
+        writer.writerow(headers)
+        #print(headers)
+        for filename in filenames:
+            #извлекаем хостнейм из имени файла
+            match=re.match(r'(^\w+)_\w+_\w+',filename)
+            hostname=match.group(1)
+            #print(headers)
+            with open(filename, 'r') as f:
+                for line in f:
+                    #извлекаем информацию для записи в файл
+                    match=re.search(r'((?:\w{2}:){5}\w{2})\s+'
+                                    r'((?:\d{1,3}.){3}\d{1,3})\s+\d+\s+dhcp-snooping\s+'
+                                    r'(\d+)\s+'
+                                    r'(\w+\/?(?:\d+)?)',line)
+                    #если совпадение найдено - записываем в файлы
+                    if match:
+                        line_output=[hostname,match.group(1),match.group(2),match.group(3),match.group(4)]
+                        #print(line_output)
+                        writer.writerow(line_output)
+    
+if __name__ == '__main__':
+    filenames=['sw1_dhcp_snooping.txt', 'sw2_dhcp_snooping.txt', 'sw3_dhcp_snooping.txt']
+    output='result_17.1.csv'
+    write_dhcp_snooping_to_csv(filenames,output)

@@ -36,3 +36,34 @@
 в файл topology.yaml. Он понадобится в следующем задании.
 
 """
+import glob
+import re
+import yaml
+
+def generate_topology_from_cdp(list_of_files,save_to_filename=None):
+    '''
+    Функция обрабатывает вывод команды show cdp neighbor из нескольких файлов и записывает итоговую
+    топологию в один словарь.
+    '''
+    result_dict_final={}
+    for files in list_of_files:
+        f = open(files, 'r')
+        output_show_cdp_neighbors=f.read()
+        #регулярное выражение для извлечения значений вывода
+        regex = r'(\w+)\s+(\w+ \d\/\d)\s+\d+\s+\w? \w? \w?\s+\S+\s+(\w+ \d\/\d)'
+        #извлекаем хостнейм
+        hostname = re.search(r'(\w+)>|#',output_show_cdp_neighbors).group(1)
+        #генератор словаря с извлечением совпадений из итератора
+        result_dict = {hostname:{match.group(2):{match.group(1):match.group(3)} for match in re.finditer(regex,output_show_cdp_neighbors)}}
+        #добавляем результаты в финальный словарь
+        result_dict_final.update(result_dict)
+    #если передано имя файла - записать результаты в файл
+    if save_to_filename:
+        with open(save_to_filename, 'w') as f_yaml:
+            yaml.dump(result_dict_final, f_yaml)
+    return result_dict_final
+
+if __name__ == '__main__':
+    sh_cdp_files = glob.glob("sh_cdp*")
+    #print(sh_cdp_files)
+    print(generate_topology_from_cdp(sh_cdp_files,'topology.yaml'))

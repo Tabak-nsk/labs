@@ -49,9 +49,51 @@ In [12]: pprint(result)
                         'R1(config)#'})
 
 """
+import yaml,re
+from netmiko import (
+    ConnectHandler,
+    NetmikoTimeoutException,
+    NetmikoAuthenticationException,
+)
 
-# списки команд с ошибками и без:
-commands_with_errors = ["logging 0255.255.1", "logging", "a"]
-correct_commands = ["logging buffered 20010", "ip http server"]
+def send_config_commands(device,config_commands,log=True):
+    bad={}
+    good={}
+    if log:
+        print('Подключаюсь к',device['host'])
+    try:
+        with ConnectHandler(**device) as ssh:
+            ssh.enable()
+            for config_command in config_commands:
+                output = ssh.send_config_set(config_command)
+                match = re.search(r'Invalid input detected|Incomplete command|Ambiguous command',output)
+                if match:
+                    print('Команда ',config_command,' выполнилась с ошибкой ',match.group(),' на устройстве ',device['host'])
+                    bad.update({config_command:output})
+                    qb=input('Продолжать выполнять команды? [y]/n:')
+                    if qb == 'n':
+                        break
+                    elif qb == 'no':
+                        break
+                else:
+                    #print('Команда ',config_command,' выполнилась без ошибки на устройстве ',device['host'])
+                    good.update({config_command:output})
+        #print(good)
+        #print(bad)
+        return(good,bad)
+    except (NetmikoTimeoutException, NetmikoAuthenticationException) as error:
+        print(error)
+    
+    
+if __name__ == "__main__":    
+    # списки команд с ошибками и без:
+    commands_with_errors = ["logging 0255.255.1", "logging", "a"]
+    correct_commands = ["logging buffered 20010", "ip http server"]
+    commands = commands_with_errors + correct_commands
 
-commands = commands_with_errors + correct_commands
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+
+    for dev in devices:
+        print(send_config_commands(dev, commands))
+        #send_config_commands(dev, commands)

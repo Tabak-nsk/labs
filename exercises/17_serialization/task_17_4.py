@@ -41,7 +41,7 @@ C-3PO,c3po@gmail.com,16/12/2019 17:24
 
 """
 
-import datetime
+import datetime, csv, re
 
 
 def convert_str_to_datetime(datetime_str):
@@ -56,3 +56,54 @@ def convert_datetime_to_str(datetime_obj):
     Конвертирует строку с датой в формате 11/10/2019 14:05 в объект datetime.
     """
     return datetime.datetime.strftime(datetime_obj, "%d/%m/%Y %H:%M")
+
+def write_last_log_to_csv(source_log,output):
+    '''
+    Функция write_last_log_to_csv обрабатывает csv файл source_log
+    Отбирает самые свежие логи при совпадении поля email
+    Записывает в csv файл результат
+    '''
+    last_log_dict={}
+    #открываем csv файл на чтение
+    with open(source_log) as f_in:
+        reader = csv.reader(f_in)
+        #считываем заголовки
+        headers = next(reader)
+        #print('Headers: ', headers)
+        #считываем построчно ф
+        for row in reader:
+            #print(row)
+            login,email,date = row
+            #print ('login=',login,' email=',email,' date=',date)
+            #Проверяем есть ли запись в словаре с текущим email в ключах
+            if last_log_dict.get(email):
+                #print('Cовпадение email найдено для email:', email)
+                #print ('Данные из файла логов ',[login,date])
+                #print ('Данные из финального словаря',last_log_dict.get(email))
+                #Если email наден проверяем дату записи
+                if convert_str_to_datetime(date)>convert_str_to_datetime(last_log_dict.get(email)[1]):
+                    #print('дата свежая нужно обновлять словарь')
+                    #если дата свежая обновляем данные словаря
+                    last_log_dict.update({email:[login,date]})
+            #Если запись в словаре не найдена - добавляем запись с ключом = email
+            else:
+                last_log_dict.update({email:[login,date]})
+        #print(last_log_dict)
+        #открываем файл на запись        
+        with open(output, 'w') as f_out:
+            writer = csv.writer(f_out)
+            #записываем заголовок
+            writer.writerow(headers)
+            for email,value in last_log_dict.items():
+                #готовим строку для записи
+                to_csv=[value[0],email,value[1]]
+                #записываем  строку в csv файл
+                writer.writerow(to_csv)
+    print('Функция write_last_log_to_csv завершила работу')
+    
+if __name__ == '__main__':
+     write_last_log_to_csv('mail_log.csv','last_log.csv')
+    
+    
+    
+    
