@@ -48,5 +48,31 @@ Out[16]: 'config term\nEnter configuration commands, one per line.  End with CNT
 
 """
 
-commands = ["logging 10.255.255.1", "logging buffered 20010", "no logging console"]
-command = "sh ip int br"
+import yaml,re
+from netmiko import (
+    ConnectHandler,
+    NetmikoTimeoutException,
+    NetmikoAuthenticationException,
+)
+from task_18_1b import send_show_command
+from task_18_2a import send_config_commands
+
+def send_commands(device,*,show=False,config=False):
+    if show and config:
+        raise ValueError('Функции send_commands переданы команды разного типа')
+    elif show:
+        return send_show_command(device,show)
+    elif config:
+        return send_config_commands(device,config)
+    
+if __name__ == "__main__":
+    commands = ["logging 10.255.255.1", "logging buffered 20010", "no logging console"]
+    command = "sh ip int br"
+    
+    
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+
+    for dev in devices:
+        #print(send_commands(dev, show=command))
+        print(send_commands(dev, config=commands, show=command))

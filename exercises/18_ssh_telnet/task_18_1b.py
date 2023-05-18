@@ -20,6 +20,7 @@ from netmiko import (
 )
 
 def send_show_command(device,command):
+    print('Подключение к устройству ',device['host'])
     try:
         with ConnectHandler(**device) as ssh:
             ssh.enable()
@@ -35,5 +36,5 @@ if __name__ == "__main__":
         devices = yaml.safe_load(f)
 
     for dev in devices:
-        #print('Подключение к устройству ',dev['host'])
+        
         print(send_show_command(dev, command))
